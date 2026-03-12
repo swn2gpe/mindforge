@@ -13,8 +13,8 @@ import { AuthService } from '../../../services/auth.service';
     <header class="header">
       <div class="header-container">
         <a routerLink="/" class="logo">
-          <span class="logo-icon" aria-hidden="true">🧠</span>
-          <span class="logo-text">QuizAI</span>
+          <span class="logo-icon" aria-hidden="true">🔥</span>
+          <span class="logo-text">MindForge</span>
         </a>
 
         @if (auth.isAuthenticated()) {

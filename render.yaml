@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: quizai
+    name: mindforge
     runtime: node
     buildCommand: npm run render-build
     startCommand: node server/server.js

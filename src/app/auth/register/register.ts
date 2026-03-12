@@ -18,7 +18,7 @@ import { scaleIn } from '../../shared/animations';
         <div class="auth-header">
           <span class="auth-icon" aria-hidden="true">🧠</span>
           <h1>Créer un compte</h1>
-          <p>Rejoignez QuizAI et commencez à réviser intelligemment</p>
+          <p>Rejoignez MindForge et commencez à réviser intelligemment</p>
         </div>
 
         @if (error()) {

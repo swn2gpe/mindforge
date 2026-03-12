@@ -1,5 +1,5 @@
 // ============================================================
-// Serveur Express pour l'application QuizAI
+// Serveur Express pour l'application MindForge
 // Gère l'authentification, les quiz, les dossiers, les fiches
 // de révision et les cartes mentales
 // ============================================================
@@ -20,7 +20,7 @@ const app = express();
 // En production, le port est fourni par l'hébergeur via la variable d'environnement PORT
 const PORT = process.env.PORT || 3000;
 // En production, utiliser une variable d'environnement pour la clé secrète
-const JWT_SECRET = process.env.JWT_SECRET || 'quizai-secret-key-2026';
+const JWT_SECRET = process.env.JWT_SECRET || 'mindforge-secret-key-2026';
 const DATA_DIR = path.join(__dirname, 'data'); // Dossier où sont stockées les données
 const AVATARS_DIR = path.join(DATA_DIR, 'avatars'); // Dossier pour les photos de profil
 
@@ -688,6 +688,6 @@ if (fs.existsSync(ANGULAR_DIST)) {
 
 // ============ Démarrage du serveur ============
 app.listen(PORT, () => {
-  console.log(`✅ Serveur QuizAI démarré sur http://localhost:${PORT}`);
+  console.log(`✅ Serveur MindForge démarré sur http://localhost:${PORT}`);
   console.log(`📁 Données stockées dans ${DATA_DIR}`);
 });

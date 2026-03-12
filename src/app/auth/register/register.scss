@@ -62,3 +62,12 @@
 .alert {
   margin-bottom: 1.5rem;
 }
+
+@media (max-width: 640px) {
+  .auth-card {
+    padding: 1.5rem;
+    border-radius: 16px;
+  }
+  .auth-icon { font-size: 2rem; }
+  .auth-header h1 { font-size: 1.25rem; }
+}

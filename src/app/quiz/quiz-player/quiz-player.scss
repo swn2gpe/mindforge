@@ -131,4 +131,7 @@
 @media (max-width: 640px) {
   .question-card { padding: 1.25rem; }
   .question-text { font-size: 1.0625rem; }
+  .option { padding: 0.75rem 1rem; }
+  .navigation { flex-wrap: wrap; }
+  .navigation .btn { flex: 1; min-width: 0; justify-content: center; }
 }

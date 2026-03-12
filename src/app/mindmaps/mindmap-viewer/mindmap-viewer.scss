@@ -190,3 +190,31 @@ $branch-colors: #6C63FF, #FF6584, #00C897, #FFB347, #4FC3F7, #AB47BC;
   width: 16px;
   height: 2px;
 }
+
+@media (max-width: 900px) {
+  .mm-children-root > .mm-branch-wrapper {
+    min-width: 140px;
+  }
+  .mm-label { max-width: 200px; }
+}
+
+@media (max-width: 640px) {
+  .viewer-page { padding: 1rem 0; }
+  .viewer-header h1 { font-size: 1.25rem; }
+  .mindmap-canvas { padding: 1.25rem 0.75rem; border-radius: 12px; }
+  .mm-root { font-size: 1rem; padding: 0.6rem 1.25rem; }
+  .mm-branch { font-size: 0.85rem; padding: 0.4rem 0.9rem; }
+  .mm-leaf { font-size: 0.775rem; padding: 0.35rem 0.75rem; }
+  .mm-label { max-width: 150px; }
+  .mm-children-root {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  .mm-children-root > .mm-branch-wrapper {
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
+  }
+  .mm-children { padding-left: 1rem; }
+}

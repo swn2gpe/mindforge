@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { ThemeService } from '../../../services/theme.service';
 import { AuthService } from '../../../services/auth.service';
@@ -18,17 +18,32 @@ import { AuthService } from '../../../services/auth.service';
         </a>
 
         @if (auth.isAuthenticated()) {
-          <nav class="nav" aria-label="Navigation principale">
-            <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          <!-- Bouton hamburger mobile -->
+          <button
+            class="menu-toggle"
+            (click)="toggleMenu()"
+            [attr.aria-expanded]="menuOpen()"
+            aria-controls="main-nav"
+            aria-label="Menu de navigation"
+            type="button">
+            <span class="hamburger" [class.open]="menuOpen()">
+              <span></span><span></span><span></span>
+            </span>
+          </button>
+
+          <div class="nav-overlay" [class.visible]="menuOpen()" (click)="closeMenu()"></div>
+
+          <nav class="nav" [class.open]="menuOpen()" id="main-nav" aria-label="Navigation principale">
+            <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">
               Accueil
             </a>
-            <a routerLink="/generate" routerLinkActive="active">
+            <a routerLink="/generate" routerLinkActive="active" (click)="closeMenu()">
               Créer un quiz
             </a>
-            <a routerLink="/folders" routerLinkActive="active">
+            <a routerLink="/folders" routerLinkActive="active" (click)="closeMenu()">
               Mes dossiers
             </a>
-            <a routerLink="/settings" routerLinkActive="active">
+            <a routerLink="/settings" routerLinkActive="active" (click)="closeMenu()">
               Paramètres
             </a>
           </nav>
@@ -51,7 +66,7 @@ import { AuthService } from '../../../services/auth.service';
                 <span class="user-name">{{ auth.currentUser()?.displayName }}</span>
               </a>
             </div>
-            <button class="btn btn-ghost btn-sm" (click)="logout()" type="button">
+            <button class="btn btn-ghost btn-sm btn-logout" (click)="logout()" type="button">
               Déconnexion
             </button>
           </div>
@@ -94,6 +109,7 @@ import { AuthService } from '../../../services/auth.service';
       font-weight: 700;
       font-size: 1.25rem;
       color: var(--text-primary);
+      flex-shrink: 0;
     }
     .logo-icon { font-size: 1.5rem; }
     .nav {
@@ -121,6 +137,7 @@ import { AuthService } from '../../../services/auth.service';
       display: flex;
       align-items: center;
       gap: 0.75rem;
+      flex-shrink: 0;
     }
     .user-info {
       display: flex;
@@ -176,10 +193,89 @@ import { AuthService } from '../../../services/auth.service';
       background: var(--border);
     }
 
-    @media (max-width: 640px) {
-      .header-container { gap: 0.5rem; padding: 0 1rem; }
-      .nav a { padding: 0.4rem 0.6rem; font-size: 0.85rem; }
+    /* Hamburger - caché par défaut sur desktop */
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem;
+      margin-left: auto;
+    }
+    .hamburger {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      width: 24px;
+    }
+    .hamburger span {
+      display: block;
+      height: 2px;
+      background: var(--text-primary);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .nav-overlay {
+      display: none;
+    }
+
+    /* ===== TABLET (max 900px) ===== */
+    @media (max-width: 900px) {
+      .header-container { gap: 1rem; padding: 0 1rem; }
+      .nav a { padding: 0.4rem 0.7rem; font-size: 0.85rem; }
       .user-name { display: none; }
+      .btn-logout { display: none; }
+    }
+
+    /* ===== MOBILE (max 640px) ===== */
+    @media (max-width: 640px) {
+      .menu-toggle {
+        display: flex;
+        order: 3;
+      }
+      .nav {
+        display: none;
+        position: fixed;
+        top: 64px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        flex-direction: column;
+        background: var(--surface);
+        padding: 1rem;
+        gap: 0.25rem;
+        z-index: 200;
+        overflow-y: auto;
+      }
+      .nav.open {
+        display: flex;
+      }
+      .nav a {
+        padding: 0.875rem 1rem;
+        font-size: 1rem;
+        border-radius: 12px;
+      }
+      .nav-overlay {
+        position: fixed;
+        inset: 0;
+        top: 64px;
+        background: rgba(0,0,0,0.4);
+        z-index: 199;
+      }
+      .nav-overlay.visible {
+        display: block;
+      }
+      .user-section {
+        gap: 0.5rem;
+        margin-left: auto;
+      }
+      .user-name { display: none; }
+      .btn-logout { display: none; }
+      .header-container { gap: 0.75rem; }
     }
   `]
 })
@@ -187,6 +283,17 @@ export class HeaderComponent {
   protected readonly theme = inject(ThemeService);
   protected readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+
+  // État du menu mobile (ouvert/fermé)
+  protected readonly menuOpen = signal(false);
+
+  protected toggleMenu(): void {
+    this.menuOpen.update(v => !v);
+  }
+
+  protected closeMenu(): void {
+    this.menuOpen.set(false);
+  }
 
   // Calcule les initiales du nom de l'utilisateur (ex: "Jean Dupont" → "JD")
   protected initials(): string {

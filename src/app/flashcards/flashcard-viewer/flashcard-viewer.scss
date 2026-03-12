@@ -118,3 +118,18 @@
   gap: 1rem;
   justify-content: center;
 }
+
+@media (max-width: 640px) {
+  .viewer-page { padding: 1rem 0; }
+  .viewer-header {
+    flex-wrap: wrap;
+    h1 { font-size: 1.25rem; }
+  }
+  .flashcard-inner { min-height: 200px; }
+  .flashcard-front, .flashcard-back { padding: 1.25rem; }
+  .flashcard-front p, .flashcard-back p { font-size: 1.0625rem; }
+  .nav-buttons { flex-wrap: wrap; }
+  .nav-buttons .btn { flex: 1; min-width: 0; justify-content: center; }
+  .finished-actions { flex-direction: column; }
+  .finished-actions .btn { width: 100%; justify-content: center; }
+}

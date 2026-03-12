@@ -198,6 +198,19 @@ $branch-colors: #6C63FF, #FF6584, #00C897, #FFB347, #4FC3F7, #AB47BC;
   }
 }
 
+@media (max-width: 640px) {
+  .editor-page { padding: 1rem 0; }
+  .editor-header h1 { font-size: 1.25rem; }
+  .tree { padding: 1rem; overflow-x: auto; }
+  .node-label { max-width: 150px; }
+  .node-pill { padding: 0.35rem 0.75rem; font-size: 0.8rem; }
+  .node-pill.root-node { font-size: 0.95rem; padding: 0.5rem 1rem; }
+  .node-children { padding-left: 1rem; margin-left: 0.5rem; }
+  .add-child-form { margin-left: 1rem; }
+  .add-child-input { width: 100%; min-width: 0; }
+  .node-delete { opacity: 1; }
+}
+
 // === Sauvegarde ===
 .save-section {
   margin-top: 2rem;

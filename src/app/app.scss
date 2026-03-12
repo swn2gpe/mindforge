@@ -4,3 +4,9 @@
   padding: 2rem 1.5rem;
   min-height: calc(100dvh - 64px);
 }
+
+@media (max-width: 640px) {
+  .main-content {
+    padding: 1.25rem 1rem;
+  }
+}

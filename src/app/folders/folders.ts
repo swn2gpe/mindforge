@@ -1,18 +1,21 @@
-import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, effect } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { ReactiveFormsModule, FormControl, Validators } from '@angular/forms';
+import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
 import { FolderService } from '../services/folder.service';
 import { FlashcardService } from '../services/flashcard.service';
 import { MindmapService } from '../services/mindmap.service';
 import { fadeInUp, staggerList, staggerItem } from '../shared/animations';
+
+type SortOption = 'name-asc' | 'name-desc' | 'date-new' | 'date-old' | 'custom';
 
 // Composant principal pour naviguer dans l'arborescence des dossiers
 // Affiche les sous-dossiers, fiches et cartes mentales du dossier courant
 @Component({
   selector: 'app-folders',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, DatePipe, ReactiveFormsModule],
+  imports: [RouterLink, DatePipe, ReactiveFormsModule, DragDropModule],
   templateUrl: './folders.html',
   styleUrl: './folders.scss',
   animations: [fadeInUp, staggerList, staggerItem]
@@ -26,6 +29,8 @@ export class FoldersComponent {
 
   // ID du dossier actuellement ouvert (null = racine)
   protected readonly currentFolderId = signal<string | null>(null);
+  protected readonly sortOption = signal<SortOption>('name-asc'); // Default sort: Name A-Z
+
   // Affiche/masque le formulaire de création de dossier
   protected readonly showNewFolder = signal(false);
   protected readonly showNewItem = signal(false);
@@ -39,20 +44,56 @@ export class FoldersComponent {
     return id ? this.folderService.getFolder(id) : undefined;
   });
 
-  // Sous-dossiers du dossier courant
-  protected readonly subFolders = computed(() =>
-    this.folderService.getChildren(this.currentFolderId())
-  );
+  // Helper function to sort any list based on sortOption
+  // Removed private sortList as logic is now inline or redundant, but keeping for reference if needed
 
-  // Paquets de fiches dans le dossier courant
-  protected readonly decksHere = computed(() =>
-    this.flashcardService.getDecksInFolder(this.currentFolderId())
-  );
 
-  // Cartes mentales dans le dossier courant
-  protected readonly mindmapsHere = computed(() =>
-    this.mindmapService.getMindmapsInFolder(this.currentFolderId())
-  );
+  // Sous-dossiers triés
+  protected readonly subFolders = computed(() => {
+    let list = this.folderService.getChildren(this.currentFolderId());
+    const option = this.sortOption();
+    if (option === 'custom') return list; // Or retain last known custom order if possible
+    return [...list].sort((a, b) => {
+        if (option === 'name-asc') return a.name.localeCompare(b.name);
+        if (option === 'name-desc') return b.name.localeCompare(a.name);
+        if (option === 'date-new') return new Date(b.createdAt||0).getTime() - new Date(a.createdAt||0).getTime();
+        if (option === 'date-old') return new Date(a.createdAt||0).getTime() - new Date(b.createdAt||0).getTime();
+        return 0;
+    });
+  });
+
+  // Paquets de fiches triés
+  protected readonly decksHere = computed(() => {
+    let list = this.flashcardService.getDecksInFolder(this.currentFolderId());
+    const option = this.sortOption();
+     if (option === 'custom') return list;
+    return [...list].sort((a, b) => {
+        if (option === 'name-asc') return a.title.localeCompare(b.title);
+        if (option === 'name-desc') return b.title.localeCompare(a.title);
+        if (option === 'date-new') return new Date(b.createdAt||0).getTime() - new Date(a.createdAt||0).getTime();
+        if (option === 'date-old') return new Date(a.createdAt||0).getTime() - new Date(b.createdAt||0).getTime();
+        return 0;
+    });
+  });
+
+  // Cartes mentales triées
+  protected readonly mindmapsHere = computed(() => {
+    let list = this.mindmapService.getMindmapsInFolder(this.currentFolderId());
+    const option = this.sortOption();
+    if (option === 'custom') return list;
+    return [...list].sort((a, b) => { 
+        if (option === 'name-asc') return a.title.localeCompare(b.title);
+        if (option === 'name-desc') return b.title.localeCompare(a.title);
+        if (option === 'date-new') return new Date(b.createdAt||0).getTime() - new Date(a.createdAt||0).getTime();
+        if (option === 'date-old') return new Date(a.createdAt||0).getTime() - new Date(b.createdAt||0).getTime();
+        return 0;
+    });
+  });
+
+  // Local mutable lists for Drag & Drop
+  protected readonly localFolders = signal<import('../models/folder.model').Folder[]>([]);
+  protected readonly localDecks = signal<import('../models/flashcard.model').FlashcardDeck[]>([]);
+  protected readonly localMindmaps = signal<import('../models/mindmap.model').Mindmap[]>([]);
 
   // Fil d'Ariane : chemin depuis la racine jusqu'au dossier courant
   protected readonly breadcrumbs = computed(() => {
@@ -74,11 +115,50 @@ export class FoldersComponent {
   });
 
   constructor() {
-    // On écoute les changements d'URL pour mettre à jour le dossier courant
+    // When service data or sort option changes, update local lists
+    effect(() => {
+        // We use untracked for local setters if needed, but here we want to react to computed changes
+        this.localFolders.set(this.subFolders());
+        this.localDecks.set(this.decksHere());
+        this.localMindmaps.set(this.mindmapsHere());
+    }, { allowSignalWrites: true });
+
+    // On écoute les changements d'URL
     this.route.paramMap.subscribe(params => {
       this.currentFolderId.set(params.get('folderId') ?? null);
     });
   }
+
+  /* ------------------------------------------------------------------
+     SORTING & DRAG AND DROP
+  ------------------------------------------------------------------ */
+
+  setSort(option: SortOption) {
+    this.sortOption.set(option);
+  }
+
+  // Handle Drag & Drop
+  drop(event: CdkDragDrop<any[]>, type: 'folder' | 'deck' | 'mindmap') {
+    if (event.previousIndex === event.currentIndex) return;
+
+    // Switch to custom sort mode implicitly 
+    this.sortOption.set('custom');
+
+    if (type === 'folder') {
+        const items = [...this.localFolders()];
+        moveItemInArray(items, event.previousIndex, event.currentIndex);
+        this.localFolders.set(items);
+    } else if (type === 'deck') {
+        const items = [...this.localDecks()];
+        moveItemInArray(items, event.previousIndex, event.currentIndex);
+        this.localDecks.set(items);
+    } else if (type === 'mindmap') {
+        const items = [...this.localMindmaps()];
+        moveItemInArray(items, event.previousIndex, event.currentIndex);
+        this.localMindmaps.set(items);
+    }
+  }
+
 
   // Navigue vers un dossier (ou la racine si id est null)
   navigateToFolder(id: string | null): void {

@@ -30,6 +30,17 @@
       </a>
     </div>
   </div>
+  
+  <div class="sort-toolbar">
+    <label for="sortSelect">Trier par :</label>
+    <select id="sortSelect" [value]="sortOption()" (change)="setSort($any($event.target).value)">
+      <option value="custom">Manuel (Glisser-déposer)</option>
+      <option value="name-asc">Nom (A-Z)</option>
+      <option value="name-desc">Nom (Z-A)</option>
+      <option value="date-new">Plus récent</option>
+      <option value="date-old">Plus ancien</option>
+    </select>
+  </div>
 
   @if (showNewFolder()) {
     <div class="new-folder-form">
@@ -59,10 +70,20 @@
   @if (subFolders().length > 0) {
     <section class="section" @fadeInUp>
       <h2 class="section-title">📁 Dossiers</h2>
-      <div class="grid" @staggerList>
-        @for (folder of subFolders(); track folder.id) {
-          <div class="item-card folder-card" @staggerItem (click)="navigateToFolder(folder.id)" (keydown.enter)="navigateToFolder(folder.id)" tabindex="0" role="button">
+      <div class="grid" @staggerList 
+           cdkDropList 
+           cdkDropListOrientation="horizontal" 
+           (cdkDropListDropped)="drop($event, 'folder')">
+        @for (folder of localFolders(); track folder.id) {
+          <div class="item-card folder-card" @staggerItem 
+               cdkDrag 
+               (click)="navigateToFolder(folder.id)" 
+               (keydown.enter)="navigateToFolder(folder.id)" 
+               tabindex="0" 
+               role="button">
+            
             <div class="item-icon" [style.background]="folder.color">📁</div>
+            <div class="drag-handle" cdkDragHandle (click)="$event.stopPropagation()">⋮⋮</div>
             <div class="item-info">
               <h3>{{ folder.name }}</h3>
               <p>{{ folder.createdAt | date:'dd/MM/yyyy' }}</p>
@@ -74,6 +95,7 @@
               [attr.aria-label]="'Supprimer le dossier ' + folder.name">
               🗑️
             </button>
+            <div *cdkDragPlaceholder class="cdk-drag-placeholder"></div>
           </div>
         }
       </div>
@@ -83,9 +105,13 @@
   @if (decksHere().length > 0) {
     <section class="section" @fadeInUp>
       <h2 class="section-title">🗂️ Fiches de révision</h2>
-      <div class="grid" @staggerList>
-        @for (deck of decksHere(); track deck.id) {
-          <div class="item-card deck-card" @staggerItem>
+      <div class="grid" @staggerList
+           cdkDropList
+           cdkDropListOrientation="horizontal"
+           (cdkDropListDropped)="drop($event, 'deck')">
+        @for (deck of localDecks(); track deck.id) {
+          <div class="item-card deck-card" @staggerItem cdkDrag>
+            <div class="drag-handle" cdkDragHandle>⋮⋮</div>
             <a [routerLink]="['/flashcards', deck.id]" class="item-link">
               <div class="item-icon deck-icon">🗂️</div>
               <div class="item-info">
@@ -100,6 +126,7 @@
               [attr.aria-label]="'Supprimer ' + deck.title">
               🗑️
             </button>
+            <div *cdkDragPlaceholder class="cdk-drag-placeholder"></div>
           </div>
         }
       </div>
@@ -109,9 +136,13 @@
   @if (mindmapsHere().length > 0) {
     <section class="section" @fadeInUp>
       <h2 class="section-title">🧠 Cartes mentales</h2>
-      <div class="grid" @staggerList>
-        @for (mm of mindmapsHere(); track mm.id) {
-          <div class="item-card mindmap-card" @staggerItem>
+      <div class="grid" @staggerList
+           cdkDropList
+           cdkDropListOrientation="horizontal"
+           (cdkDropListDropped)="drop($event, 'mindmap')">
+        @for (mm of localMindmaps(); track mm.id) {
+          <div class="item-card mindmap-card" @staggerItem cdkDrag>
+            <div class="drag-handle" cdkDragHandle>⋮⋮</div>
             <a [routerLink]="['/mindmaps', mm.id]" class="item-link">
               <div class="item-icon mindmap-icon">🧠</div>
               <div class="item-info">
@@ -126,6 +157,7 @@
               [attr.aria-label]="'Supprimer ' + mm.title">
               🗑️
             </button>
+            <div *cdkDragPlaceholder class="cdk-drag-placeholder"></div>
           </div>
         }
       </div>

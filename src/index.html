@@ -106,19 +106,40 @@
   </div>
   <app-root></app-root>
   <script>
-    // Masquer le splash dès qu'Angular est prêt (l'élément app-root est rempli)
-    const observer = new MutationObserver(() => {
-      const root = document.querySelector('app-root');
-      if (root && root.children.length > 0) {
-        const splash = document.getElementById('splash-screen');
+    // Masquer le splash après un minimum de 5 secondes ET quand Angular est prêt
+    (function() {
+      var splashStart = Date.now();
+      var MIN_DURATION = 5000; // 5 secondes minimum
+      var angularReady = false;
+
+      function hideSplash() {
+        var splash = document.getElementById('splash-screen');
         if (splash) {
           splash.classList.add('fade-out');
-          setTimeout(() => splash.remove(), 500);
+          setTimeout(function() { splash.remove(); }, 500);
         }
-        observer.disconnect();
       }
-    });
-    observer.observe(document.querySelector('app-root'), { childList: true });
+
+      function tryHide() {
+        if (!angularReady) return;
+        var elapsed = Date.now() - splashStart;
+        if (elapsed >= MIN_DURATION) {
+          hideSplash();
+        } else {
+          setTimeout(hideSplash, MIN_DURATION - elapsed);
+        }
+      }
+
+      var observer = new MutationObserver(function() {
+        var root = document.querySelector('app-root');
+        if (root && root.children.length > 0) {
+          angularReady = true;
+          observer.disconnect();
+          tryHide();
+        }
+      });
+      observer.observe(document.querySelector('app-root'), { childList: true });
+    })();
   </script>
   <noscript>Please enable JavaScript to continue using this application.</noscript>
 </body>

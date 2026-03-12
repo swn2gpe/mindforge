@@ -7,7 +7,7 @@
     "server": "node server/server.js",
     "build": "ng build",
     "build:prod": "ng build && echo Build terminé !",
-    "start:prod": "node server/server.js",    "render-build": "npm install && npx ng build",    "watch": "ng build --watch --configuration development",
+    "start:prod": "node server/server.js",    "render-build": "npm install --include=dev && npx ng build --configuration production",    "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
   "private": true,

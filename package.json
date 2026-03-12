@@ -8,7 +8,7 @@
     "build": "ng build",
     "build:prod": "ng build && echo Build terminé !",
     "start:prod": "node server/server.js",
-    "render-build": "npm install --include=dev && npx ng build --configuration production",
+    "render-build": "npm install --include=dev --legacy-peer-deps && npx ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -22,7 +22,7 @@
     "@angular/forms": "^21.2.0",
     "@angular/platform-browser": "^21.2.0",
     "@angular/router": "^21.2.0",
-    "@angular/service-worker": "^21.2.4",
+    "@angular/service-worker": "^21.2.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "express": "^5.2.1",

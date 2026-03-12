@@ -16,7 +16,7 @@ import { CommonModule } from '@angular/common'; // Important for ngClass/Style i
         <!-- Logo -->
         <a routerLink="/" class="logo">
           <div class="logo-icon-wrapper">
-            <span class="logo-icon">?</span>
+            <span class="logo-icon">🔥</span>
           </div>
           <span class="logo-text">MindForge</span>
         </a>
@@ -28,13 +28,13 @@ import { CommonModule } from '@angular/common'; // Important for ngClass/Style i
               <span class="nav-label">Accueil</span>
             </a>
             <a routerLink="/generate" routerLinkActive="active" class="nav-link">
-              <span class="nav-label">? Nouveau</span>
+              <span class="nav-label">✨ Nouveau</span>
             </a>
             <a routerLink="/folders" routerLinkActive="active" class="nav-link">
               <span class="nav-label">Dossiers</span>
             </a>
             <a routerLink="/settings" routerLinkActive="active" class="nav-link">
-              <span class="nav-label">R�glages</span>
+              <span class="nav-label">Réglages</span>
             </a>
           </nav>
 
@@ -44,7 +44,7 @@ import { CommonModule } from '@angular/common'; // Important for ngClass/Style i
               class="theme-toggle"
               (click)="theme.toggle()"
               [attr.aria-label]="theme.isDark() ? 'Mode clair' : 'Mode sombre'">
-              <span class="theme-icon">{{ theme.isDark() ? '??' : '??' }}</span>
+              <span class="theme-icon">{{ theme.isDark() ? '☀️' : '🌙' }}</span>
             </button>
 
             <a routerLink="/profile" class="user-profile" aria-label="Mon profil">
@@ -73,7 +73,7 @@ import { CommonModule } from '@angular/common'; // Important for ngClass/Style i
             class="theme-toggle"
             (click)="theme.toggle()"
             [attr.aria-label]="theme.isDark() ? 'Mode clair' : 'Mode sombre'">
-            <span class="theme-icon">{{ theme.isDark() ? '??' : '??' }}</span>
+            <span class="theme-icon">{{ theme.isDark() ? '☀️' : '🌙' }}</span>
           </button>
           <a routerLink="/login" class="btn btn-primary" style="margin-left: 1rem;">Connexion</a>
         }
@@ -83,20 +83,20 @@ import { CommonModule } from '@angular/common'; // Important for ngClass/Style i
       <div class="mobile-nav" [class.open]="menuOpen()">
         <div class="mobile-nav-content">
           <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">
-            ?? Accueil
+            🏠 Accueil
           </a>
           <a routerLink="/generate" routerLinkActive="active" (click)="closeMenu()">
-            ? Cr�er un quiz
+            ✨ Créer un quiz
           </a>
           <a routerLink="/folders" routerLinkActive="active" (click)="closeMenu()">
-            ?? Mes dossiers
+            📂 Mes dossiers
           </a>
           <a routerLink="/settings" routerLinkActive="active" (click)="closeMenu()">
-            ?? Param�tres
+            ⚙️ Paramètres
           </a>
           <div class="divider"></div>
           <button class="btn-logout-mobile" (click)="logout()">
-            D�connexion
+            🚪 Déconnexion
           </button>
         </div>
       </div>

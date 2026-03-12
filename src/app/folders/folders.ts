@@ -35,6 +35,11 @@ export class FoldersComponent {
   protected readonly showNewFolder = signal(false);
   protected readonly showNewItem = signal(false);
 
+  // Ordre personnalisé (mémoire de session pour le drag & drop)
+  protected readonly customFolderOrder = signal<Map<string, string[]>>(new Map());
+  protected readonly customDeckOrder = signal<Map<string, string[]>>(new Map());
+  protected readonly customMindmapOrder = signal<Map<string, string[]>>(new Map());
+
   // Champ de saisie pour le nom du nouveau dossier
   protected readonly folderName = new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(1)] });
 
@@ -52,7 +57,21 @@ export class FoldersComponent {
   protected readonly subFolders = computed(() => {
     let list = this.folderService.getChildren(this.currentFolderId());
     const option = this.sortOption();
-    if (option === 'custom') return list; // Or retain last known custom order if possible
+    if (option === 'custom') {
+      const parentId = this.currentFolderId() ?? 'root';
+      const order = this.customFolderOrder().get(parentId);
+      if (order) {
+        return [...list].sort((a, b) => {
+          const indexA = order.indexOf(a.id);
+          const indexB = order.indexOf(b.id);
+          if (indexA === -1 && indexB === -1) return 0;
+          if (indexA === -1) return 1;
+          if (indexB === -1) return -1;
+          return indexA - indexB;
+        });
+      }
+      return list;
+    }
     return [...list].sort((a, b) => {
         if (option === 'name-asc') return a.name.localeCompare(b.name);
         if (option === 'name-desc') return b.name.localeCompare(a.name);
@@ -66,7 +85,21 @@ export class FoldersComponent {
   protected readonly decksHere = computed(() => {
     let list = this.flashcardService.getDecksInFolder(this.currentFolderId());
     const option = this.sortOption();
-     if (option === 'custom') return list;
+    if (option === 'custom') {
+      const parentId = this.currentFolderId() ?? 'root';
+      const order = this.customDeckOrder().get(parentId);
+      if (order) {
+        return [...list].sort((a, b) => {
+          const indexA = order.indexOf(a.id);
+          const indexB = order.indexOf(b.id);
+          if (indexA === -1 && indexB === -1) return 0;
+          if (indexA === -1) return 1;
+          if (indexB === -1) return -1;
+          return indexA - indexB;
+        });
+      }
+      return list;
+    }
     return [...list].sort((a, b) => {
         if (option === 'name-asc') return a.title.localeCompare(b.title);
         if (option === 'name-desc') return b.title.localeCompare(a.title);
@@ -80,7 +113,21 @@ export class FoldersComponent {
   protected readonly mindmapsHere = computed(() => {
     let list = this.mindmapService.getMindmapsInFolder(this.currentFolderId());
     const option = this.sortOption();
-    if (option === 'custom') return list;
+    if (option === 'custom') {
+      const parentId = this.currentFolderId() ?? 'root';
+      const order = this.customMindmapOrder().get(parentId);
+      if (order) {
+        return [...list].sort((a, b) => {
+          const indexA = order.indexOf(a.id);
+          const indexB = order.indexOf(b.id);
+          if (indexA === -1 && indexB === -1) return 0;
+          if (indexA === -1) return 1;
+          if (indexB === -1) return -1;
+          return indexA - indexB;
+        });
+      }
+      return list;
+    }
     return [...list].sort((a, b) => { 
         if (option === 'name-asc') return a.title.localeCompare(b.title);
         if (option === 'name-desc') return b.title.localeCompare(a.title);
@@ -144,18 +191,38 @@ export class FoldersComponent {
     // Switch to custom sort mode implicitly 
     this.sortOption.set('custom');
 
+    const parentId = this.currentFolderId() ?? 'root';
+
     if (type === 'folder') {
         const items = [...this.localFolders()];
         moveItemInArray(items, event.previousIndex, event.currentIndex);
-        this.localFolders.set(items);
+        const order = items.map(i => i.id);
+        
+        this.customFolderOrder.update(map => {
+            const newMap = new Map(map);
+            newMap.set(parentId, order);
+            return newMap;
+        });
     } else if (type === 'deck') {
         const items = [...this.localDecks()];
         moveItemInArray(items, event.previousIndex, event.currentIndex);
-        this.localDecks.set(items);
+        const order = items.map(i => i.id);
+        
+        this.customDeckOrder.update(map => {
+            const newMap = new Map(map);
+            newMap.set(parentId, order);
+            return newMap;
+        });
     } else if (type === 'mindmap') {
         const items = [...this.localMindmaps()];
         moveItemInArray(items, event.previousIndex, event.currentIndex);
-        this.localMindmaps.set(items);
+        const order = items.map(i => i.id);
+        
+        this.customMindmapOrder.update(map => {
+            const newMap = new Map(map);
+            newMap.set(parentId, order);
+            return newMap;
+        });
     }
   }
 

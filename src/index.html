@@ -7,8 +7,112 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Transformez vos cours en quiz interactifs grâce à l'intelligence artificielle.">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <style>
+    /* Écran de chargement — affiché avant que Angular ne se charge */
+    .splash {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #F5F7FB;
+      color: #1a1a2e;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+    [data-theme="dark"] .splash {
+      background: #0f0f23;
+      color: #e2e8f0;
+    }
+    .splash.fade-out {
+      opacity: 0;
+      visibility: hidden;
+    }
+    .splash-logo {
+      font-size: 3.5rem;
+      margin-bottom: 1.25rem;
+      animation: splash-bounce 1.2s ease infinite;
+    }
+    .splash-title {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #6C63FF, #FF6584);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .splash-subtitle {
+      font-size: 0.95rem;
+      color: #6b7280;
+      margin-bottom: 2.5rem;
+    }
+    [data-theme="dark"] .splash-subtitle {
+      color: #94a3b8;
+    }
+    .splash-bar {
+      width: 180px;
+      height: 4px;
+      background: #e5e7eb;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    [data-theme="dark"] .splash-bar {
+      background: #1e293b;
+    }
+    .splash-bar-fill {
+      width: 40%;
+      height: 100%;
+      background: linear-gradient(90deg, #6C63FF, #FF6584);
+      border-radius: 4px;
+      animation: splash-loading 1.2s ease-in-out infinite;
+    }
+    @keyframes splash-loading {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(350%); }
+    }
+    @keyframes splash-bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+  </style>
 </head>
 <body>
+  <script>
+    // Appliquer le thème sauvegardé immédiatement (évite le flash blanc/noir)
+    (function() {
+      var stored = localStorage.getItem('quiz-app-theme');
+      var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+  <!-- Écran de chargement visible immédiatement -->
+  <div class="splash" id="splash-screen">
+    <div class="splash-logo" aria-hidden="true">🔥</div>
+    <div class="splash-title">MindForge</div>
+    <div class="splash-subtitle">Chargement de votre espace…</div>
+    <div class="splash-bar" role="progressbar" aria-label="Chargement en cours">
+      <div class="splash-bar-fill"></div>
+    </div>
+  </div>
   <app-root></app-root>
+  <script>
+    // Masquer le splash dès qu'Angular est prêt (l'élément app-root est rempli)
+    const observer = new MutationObserver(() => {
+      const root = document.querySelector('app-root');
+      if (root && root.children.length > 0) {
+        const splash = document.getElementById('splash-screen');
+        if (splash) {
+          splash.classList.add('fade-out');
+          setTimeout(() => splash.remove(), 500);
+        }
+        observer.disconnect();
+      }
+    });
+    observer.observe(document.querySelector('app-root'), { childList: true });
+  </script>
 </body>
 </html>

@@ -1,38 +1,78 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+// ============ Modern MindForge Design System ============
+
+// Fonts
+$font-stack: 'Outfit', sans-serif;
+$font-mono: 'Space Grotesk', monospace;
 
 // ============ Theme Variables ============
-:root,
+:root {
+  /* Core Palette - Ultra Modern (Deep Space & Neon) */
+  --primary-hue: 250; /* Deep Indigo/Purple */
+  --secondary-hue: 330; /* Hot Pink */
+  
+  --primary: hsl(var(--primary-hue), 85%, 65%);
+  --primary-glow: hsla(var(--primary-hue), 85%, 65%, 0.5);
+  --secondary: hsl(var(--secondary-hue), 85%, 60%);
+  --secondary-glow: hsla(var(--secondary-hue), 85%, 60%, 0.5);
+  
+  --accent: #00f2ff; /* Cyan neon */
+  --success: #00d26a;
+  --danger: #ff2e63;
+  --warning: #ffcc00;
+
+  /* Spacing */
+  --radius-sm: 0.75rem;
+  --radius-md: 1.25rem;
+  --radius-lg: 1.75rem;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* LIGHT THEME (Clean, Spatial) */
 [data-theme="light"] {
-  --primary: #6C63FF;
-  --primary-light: rgba(108, 99, 255, 0.1);
-  --secondary: #FF6584;
-  --success: #00C897;
-  --error: #FF4757;
-  --warning: #FFA502;
-
-  --bg: #F5F7FB;
-  --surface: rgba(255, 255, 255, 0.95);
-  --text-primary: #1a1a2e;
-  --text-secondary: #6b7280;
-  --border: #e5e7eb;
-  --hover: #f3f4f6;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --bg-page: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-surface-glass: rgba(255, 255, 255, 0.7);
+  
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  
+  --border-color: #e2e8f0;
+  --border-glass: rgba(255, 255, 255, 0.6);
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 10px 30px -5px rgba(100, 100, 255, 0.1);
+  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
+  
+  --input-bg: #f1f5f9;
 }
 
+/* DARK THEME (Cyberpunk, Deep) */
 [data-theme="dark"] {
-  --bg: #0f0f23;
-  --surface: rgba(30, 30, 60, 0.95);
-  --text-primary: #e2e8f0;
-  --text-secondary: #94a3b8;
-  --border: #334155;
-  --hover: #1e293b;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --bg-page: #050508; /* Almost pitch black */
+  --bg-surface: #0f1016;
+  --bg-surface-glass: rgba(20, 20, 30, 0.6);
+  
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-light: #475569;
+  
+  --border-color: #1e293b;
+  --border-glass: rgba(255, 255, 255, 0.08); /* Frosted border */
+  --shadow-sm: 0 4px 10px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 20px 40px -10px rgba(0, 0, 0, 0.8);
+  --shadow-glow: 0 0 30px rgba(120, 80, 255, 0.2);
+  
+  --input-bg: #0a0b10;
 }
 
-// ============ Reset & Base ============
-*,
-*::before,
-*::after {
+// ============ Base Styles ============
+*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -40,199 +80,191 @@
 
 html {
   scroll-behavior: smooth;
+  font-size: 16px;
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: var(--bg);
-  color: var(--text-primary);
-  line-height: 1.6;
+  font-family: $font-stack;
+  background-color: var(--bg-page);
+  /* Mesh Gradient Background */
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(108, 99, 255, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(255, 101, 132, 0.08) 0%, transparent 40%);
+  background-attachment: fixed;
+  color: var(--text-main);
+  line-height: 1.5;
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+}
+
+h1 {
+  font-size: 3rem;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1.5rem;
 }
 
 a {
   color: var(--primary);
   text-decoration: none;
-
+  font-weight: 600;
+  transition: color 0.2s var(--ease-smooth);
+  
   &:hover {
-    text-decoration: underline;
+    color: var(--secondary);
   }
 }
 
-// ============ Buttons ============
+// ============ Components: Buttons ============
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
-  border-radius: 10px;
+  gap: 0.75rem;
+  padding: 0.875rem 1.75rem;
+  border-radius: var(--radius-full);
   font-weight: 600;
-  font-size: 0.875rem;
-  font-family: inherit;
+  font-family: $font-stack;
+  font-size: 1rem;
+  transition: all 0.3s var(--ease-elastic);
+  border: 1px solid transparent;
   cursor: pointer;
-  transition: all 0.2s;
-  text-decoration: none;
-  border: none;
-  line-height: 1.4;
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 0.02em;
 
   &:hover {
-    text-decoration: none;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
   }
 
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  &:active {
+    transform: translateY(1px);
   }
 }
 
 .btn-primary {
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
   color: white;
-
-  &:hover:not(:disabled) {
+  border: none;
+  
+  &:hover {
     filter: brightness(1.1);
-    transform: translateY(-1px);
   }
 }
 
 .btn-outline {
   background: transparent;
-  border: 2px solid var(--border);
-  color: var(--text-primary);
-
-  &:hover:not(:disabled) {
+  color: var(--text-main);
+  border: 2px solid var(--border-color);
+  
+  &:hover {
     border-color: var(--primary);
+    background: rgba(100, 100, 255, 0.05);
     color: var(--primary);
   }
 }
 
-.btn-ghost {
-  background: transparent;
-  color: var(--text-secondary);
+// ============ Components: Cards (Bento/Glass) ============
+.card {
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  padding: 2rem;
+  border: 1px solid var(--border-glass);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.4s var(--ease-smooth);
+  /* Glassmorphism hook */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
 
-  &:hover:not(:disabled) {
-    background: var(--hover);
-    color: var(--text-primary);
+  /* Subtle inner light */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  &:hover {
+    transform: translateY(-5px) scale(1.005);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-glow);
   }
 }
 
-.btn-lg {
-  padding: 0.875rem 1.75rem;
-  font-size: 1rem;
-  border-radius: 12px;
-}
-
-.btn-sm {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.8125rem;
-}
-
-// ============ Alerts ============
-.alert {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
+// ============ Components: Inputs ============
+input, select, textarea {
+  width: 100%;
   padding: 1rem 1.25rem;
-  border-radius: 12px;
-  margin-bottom: 1.5rem;
-  font-size: 0.9375rem;
-  line-height: 1.5;
-}
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: var(--input-bg);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 1rem;
+  transition: all 0.2s;
 
-.alert-warning {
-  background: rgba(255, 165, 2, 0.1);
-  border: 1px solid rgba(255, 165, 2, 0.3);
-}
-
-.alert-error {
-  background: rgba(255, 71, 87, 0.1);
-  border: 1px solid rgba(255, 71, 87, 0.3);
-}
-
-// ============ Forms ============
-.form-group {
-  margin-bottom: 1.5rem;
-
-  label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: var(--text-primary);
-  }
-
-  input,
-  textarea,
-  select {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    background: var(--surface);
-    color: var(--text-primary);
-    font-size: 0.9375rem;
-    font-family: inherit;
-    transition: border-color 0.2s;
-
-    &:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px var(--primary-light);
-    }
-
-    &::placeholder {
-      color: var(--text-secondary);
-      opacity: 0.7;
-    }
-  }
-
-  small {
-    display: block;
-    margin-top: 0.375rem;
-    color: var(--text-secondary);
-    font-size: 0.8125rem;
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-glow);
+    background: var(--bg-surface);
   }
 }
 
-// ============ Spinner ============
-.spinner {
-  display: inline-block;
-  width: 1rem;
-  height: 1rem;
-  border: 2px solid currentColor;
-  border-right-color: transparent;
-  border-radius: 50%;
-  animation: spin 0.6s linear infinite;
+// ============ Utility Classes ============
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
 }
 
-@keyframes spin {
+.title-display {
+  font-size: 4rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  background: linear-gradient(to right, var(--primary), var(--secondary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+  animation: shine 5s linear infinite;
+}
+
+@keyframes shine {
+  to { background-position: 200% center; }
+}
+
+// ============ Animations ============
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-// ============ Focus Visible ============
-:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
+.animate-enter {
+  animation: fadeInUp 0.6s var(--ease-smooth) forwards;
 }
 
-// ============ Responsive Global ============
-@media (max-width: 640px) {
-  .btn-lg {
-    padding: 0.75rem 1.25rem;
-    font-size: 0.9375rem;
-  }
-
-  .form-group {
-    margin-bottom: 1.25rem;
-
-    input,
-    textarea,
-    select {
-      padding: 0.625rem 0.875rem;
-      font-size: 0.875rem;
-    }
-  }
-}

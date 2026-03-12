@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common'; // Important for ngClass/Style i
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, RouterLinkActive, CommonModule],
-  template: \
+  template: `
     <header class="header">
       <div class="header-glass"></div>
       <div class="header-container">
@@ -34,7 +34,7 @@ import { CommonModule } from '@angular/common'; // Important for ngClass/Style i
               <span class="nav-label">Dossiers</span>
             </a>
             <a routerLink="/settings" routerLinkActive="active" class="nav-link">
-              <span class="nav-label">Réglages</span>
+              <span class="nav-label">Rï¿½glages</span>
             </a>
           </nav>
 
@@ -86,23 +86,23 @@ import { CommonModule } from '@angular/common'; // Important for ngClass/Style i
             ?? Accueil
           </a>
           <a routerLink="/generate" routerLinkActive="active" (click)="closeMenu()">
-            ? Créer un quiz
+            ? Crï¿½er un quiz
           </a>
           <a routerLink="/folders" routerLinkActive="active" (click)="closeMenu()">
             ?? Mes dossiers
           </a>
           <a routerLink="/settings" routerLinkActive="active" (click)="closeMenu()">
-            ?? Paramètres
+            ?? Paramï¿½tres
           </a>
           <div class="divider"></div>
           <button class="btn-logout-mobile" (click)="logout()">
-            Déconnexion
+            Dï¿½connexion
           </button>
         </div>
       </div>
     </header>
-  \,
-  styles: [\
+  `,
+  styles: [`
     :host {
       display: block;
       position: sticky;
@@ -123,7 +123,6 @@ import { CommonModule } from '@angular/common'; // Important for ngClass/Style i
     .header-glass {
       position: absolute;
       inset: 0;
-      background: rgba(var(--bg-surface-rgb), 0.8); /* Fallback */
       background: var(--bg-surface-glass);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
@@ -208,7 +207,7 @@ import { CommonModule } from '@angular/common'; // Important for ngClass/Style i
 
     .nav-link:hover {
       color: var(--text-main);
-      background: rgba(var(--primary-hue), 0.05);
+      background: hsla(var(--primary-hue), 85%, 65%, 0.05);
     }
 
     .nav-link.active {
@@ -391,7 +390,7 @@ import { CommonModule } from '@angular/common'; // Important for ngClass/Style i
       .menu-toggle { display: flex; }
       .header-container { padding: 0 1rem; }
     }
-  \]
+  `]
 })
 export class HeaderComponent {
   readonly theme = inject(ThemeService);

@@ -7,7 +7,9 @@
     "server": "node server/server.js",
     "build": "ng build",
     "build:prod": "ng build && echo Build terminé !",
-    "start:prod": "node server/server.js",    "render-build": "npm install --include=dev && npx ng build --configuration production",    "watch": "ng build --watch --configuration development",
+    "start:prod": "node server/server.js",
+    "render-build": "npm install --include=dev && npx ng build --configuration production",
+    "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
   "private": true,
@@ -25,6 +27,7 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "mammoth": "^1.11.0",
+    "mongodb": "^7.1.0",
     "multer": "^2.1.1",
     "pdf-parse": "^1.1.1",
     "pptx2json": "^0.0.10",

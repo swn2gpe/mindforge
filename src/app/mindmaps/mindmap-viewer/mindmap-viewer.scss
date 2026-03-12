@@ -1,0 +1,192 @@
+// Palette de couleurs pour les branches (une couleur par branche de niveau 1)
+$branch-colors: #6C63FF, #FF6584, #00C897, #FFB347, #4FC3F7, #AB47BC;
+
+.viewer-page {
+  padding: 2rem 0;
+}
+.viewer-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  h1 { margin: 0; font-size: 1.5rem; flex: 1; }
+}
+
+// Conteneur principal de la carte mentale
+.mindmap-canvas {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  overflow-x: auto;
+  min-height: 300px;
+}
+.mindmap-centered {
+  display: flex;
+  justify-content: center;
+}
+
+// === Noeud ===
+.mm-node {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+// Noeud racine : centré
+.mm-node[data-depth="0"] {
+  align-items: center;
+}
+
+// === Pilule (conteneur texte du noeud) ===
+.mm-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 1rem;
+  border-radius: 30px;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 2px solid transparent;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+}
+
+// Style racine
+.mm-root {
+  background: linear-gradient(135deg, #6C63FF, #FF6584);
+  color: white;
+  font-weight: 700;
+  font-size: 1.15rem;
+  padding: 0.75rem 1.75rem;
+  border-radius: 40px;
+  box-shadow: 0 6px 24px rgba(108, 99, 255, 0.35);
+}
+
+// Style branche niveau 1
+.mm-branch {
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.5rem 1.15rem;
+  color: white;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+}
+
+// Couleurs automatiques pour les branches de niveau 1
+@for $i from 1 through 6 {
+  .mm-children-root > .mm-branch-wrapper:nth-child(#{$i}) > .mm-node > .mm-pill.mm-branch {
+    background: nth($branch-colors, $i);
+  }
+  .mm-children-root > .mm-branch-wrapper:nth-child(#{$i}) .mm-connector-line {
+    background: nth($branch-colors, $i);
+  }
+  // Les feuilles enfants héritent une bordure de la couleur de branche
+  .mm-children-root > .mm-branch-wrapper:nth-child(#{$i}) .mm-leaf {
+    border-color: rgba(nth($branch-colors, $i), 0.35);
+    color: var(--text-primary);
+  }
+}
+
+// Style feuille (niveau 2+)
+.mm-leaf {
+  background: var(--hover);
+  font-size: 0.825rem;
+  padding: 0.4rem 0.9rem;
+  border: 2px solid var(--border);
+}
+
+// === Icône ===
+.mm-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+// === Texte ===
+.mm-label {
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// === Badge compteur enfants ===
+.mm-badge {
+  font-size: 0.625rem;
+  font-weight: 700;
+  background: rgba(255,255,255,0.25);
+  border-radius: 10px;
+  padding: 0.1rem 0.4rem;
+  min-width: 18px;
+  text-align: center;
+}
+.mm-branch .mm-badge {
+  background: rgba(255,255,255,0.3);
+}
+
+// === Enfants ===
+.mm-children {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-left: 1.5rem;
+  margin-top: 0.25rem;
+}
+
+// Enfants de la racine : disposition en grille horizontale
+.mm-children-root {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding-left: 0;
+  margin-top: 1.5rem;
+  justify-content: center;
+}
+
+.mm-children-root > .mm-branch-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 180px;
+  max-width: 320px;
+}
+
+.mm-children-root > .mm-branch-wrapper > .mm-node {
+  align-items: center;
+}
+
+.mm-children-root > .mm-branch-wrapper > .mm-node > .mm-pill {
+  text-align: center;
+}
+
+// Les sous-branches reviennent à une disposition verticale à gauche
+.mm-children-root > .mm-branch-wrapper .mm-children {
+  align-items: flex-start;
+  width: 100%;
+}
+
+// === Connecteur (ligne entre parent et enfant) ===
+.mm-connector {
+  display: flex;
+  justify-content: center;
+  padding: 0.15rem 0;
+}
+.mm-connector-line {
+  width: 2px;
+  height: 16px;
+  background: var(--border);
+  border-radius: 2px;
+}
+
+// Connecteurs horizontaux (pas dans root)
+.mm-children:not(.mm-children-root) .mm-connector {
+  justify-content: flex-start;
+  padding-left: 1rem;
+}
+.mm-children:not(.mm-children-root) .mm-connector-line {
+  width: 16px;
+  height: 2px;
+}

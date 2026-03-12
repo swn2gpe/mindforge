@@ -1,0 +1,74 @@
+<div class="quiz-generator" @fadeInUp>
+  <h1>Créer un quiz</h1>
+  <p class="subtitle">
+    Collez votre cours ou importez un fichier (texte, Word, PowerPoint), et l'IA génèrera un quiz personnalisé.
+  </p>
+
+  @if (!aiService.isConfigured()) {
+    <div class="alert alert-warning">
+      <span aria-hidden="true">⚠️</span>
+      <div>
+        <strong>Configuration requise</strong>
+        <p>Veuillez d'abord <a routerLink="/settings">configurer votre clé API</a> pour utiliser l'IA.</p>
+      </div>
+    </div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="generate()">
+    <div class="form-group">
+      <label for="courseText">Contenu du cours</label>
+      <textarea
+        id="courseText"
+        formControlName="text"
+        rows="14"
+        placeholder="Collez votre cours, vos notes ou tout texte éducatif ici...
+
+Exemple : La photosynthèse est le processus par lequel les plantes convertissent la lumière du soleil en énergie. Ce processus se déroule principalement dans les chloroplastes..."></textarea>
+      <div class="textarea-footer">
+        <span
+          [class.text-error]="form.controls.text.value.length > 0 && form.controls.text.value.length < 100">
+          {{ form.controls.text.value.length }} caractères
+          @if (form.controls.text.value.length > 0 && form.controls.text.value.length < 100) {
+            (minimum 100)
+          }
+        </span>
+        <label class="file-upload" [class.disabled]="extracting()">
+          @if (extracting()) {
+            <span class="spinner" aria-hidden="true"></span> Extraction du texte...
+          } @else {
+            📎 Importer un fichier
+          }
+          <input
+            type="file"
+            accept=".txt,.docx,.pptx,.pdf"
+            (change)="onFileUpload($event)"
+            [disabled]="extracting()"
+            hidden
+            aria-label="Importer un fichier texte, Word ou PowerPoint">
+        </label>
+      </div>
+      <p class="file-formats-hint">Formats acceptés : .txt, .docx (Word), .pptx (PowerPoint), .pdf</p>
+      @if (importedFileName()) {
+        <p class="imported-file">📄 Fichier importé : <strong>{{ importedFileName() }}</strong></p>
+      }
+    </div>
+
+    <button
+      type="submit"
+      class="btn btn-primary btn-lg generate-btn"
+      [disabled]="form.invalid || loading() || extracting() || !aiService.isConfigured()">
+      @if (loading()) {
+        <span class="spinner" aria-hidden="true"></span> Génération en cours...
+      } @else {
+        ✨ Générer le quiz
+      }
+    </button>
+  </form>
+
+  @if (error()) {
+    <div class="alert alert-error" role="alert">
+      <span aria-hidden="true">❌</span>
+      <p>{{ error() }}</p>
+    </div>
+  }
+</div>

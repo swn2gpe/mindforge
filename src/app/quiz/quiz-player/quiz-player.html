@@ -1,0 +1,89 @@
+@if (quiz(); as q) {
+  <div class="quiz-player" @fadeInUp>
+    <div class="quiz-header">
+      <h1>{{ q.title }}</h1>
+      <app-progress-bar [current]="currentIndex() + 1" [total]="q.questions.length" />
+    </div>
+
+    @if (currentQuestion(); as question) {
+      <div class="question-card" [@questionSlide]="currentIndex()">
+        <div class="question-meta">
+          <span class="question-type">{{ typeLabel(question.type) }}</span>
+          <span class="question-number">Question {{ currentIndex() + 1 }}</span>
+        </div>
+
+        <h2 class="question-text">{{ question.question }}</h2>
+
+        @switch (question.type) {
+          @case ('mcq') {
+            <fieldset class="options">
+              <legend class="sr-only">Choisissez une réponse</legend>
+              @for (option of question.options; track option) {
+                <label class="option" [class.selected]="answers().get(question.id) === option">
+                  <input
+                    type="radio"
+                    [name]="'question-' + question.id"
+                    [value]="option"
+                    [checked]="answers().get(question.id) === option"
+                    (change)="selectAnswer(question.id, option)">
+                  <span class="option-text">{{ option }}</span>
+                </label>
+              }
+            </fieldset>
+          }
+          @case ('true-false') {
+            <fieldset class="options">
+              <legend class="sr-only">Vrai ou Faux</legend>
+              @for (option of ['Vrai', 'Faux']; track option) {
+                <label class="option" [class.selected]="answers().get(question.id) === option">
+                  <input
+                    type="radio"
+                    [name]="'question-' + question.id"
+                    [value]="option"
+                    [checked]="answers().get(question.id) === option"
+                    (change)="selectAnswer(question.id, option)">
+                  <span class="option-text">{{ option }}</span>
+                </label>
+              }
+            </fieldset>
+          }
+          @case ('open') {
+            <div class="open-answer">
+              <label [for]="'open-' + question.id" class="sr-only">Votre réponse</label>
+              <textarea
+                [id]="'open-' + question.id"
+                [value]="answers().get(question.id) ?? ''"
+                (input)="onOpenAnswer(question.id, $event)"
+                placeholder="Tapez votre réponse ici..."
+                rows="4"></textarea>
+            </div>
+          }
+        }
+      </div>
+
+      <div class="navigation">
+        <button
+          type="button"
+          (click)="previous()"
+          [disabled]="currentIndex() === 0"
+          class="btn btn-outline">
+          ← Précédent
+        </button>
+
+        @if (currentIndex() < q.questions.length - 1) {
+          <button type="button" (click)="next()" class="btn btn-primary">
+            Suivant →
+          </button>
+        } @else {
+          <button
+            type="button"
+            (click)="finish()"
+            class="btn btn-primary"
+            [disabled]="!allAnswered()">
+            Terminer ✓
+          </button>
+        }
+      </div>
+    }
+  </div>
+}

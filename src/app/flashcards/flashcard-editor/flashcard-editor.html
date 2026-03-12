@@ -1,0 +1,133 @@
+<div class="editor-page">
+  <div class="editor-header">
+    <a routerLink="/folders" class="btn btn-ghost btn-sm">← Retour</a>
+    <h1>{{ isNew ? 'Nouvelle fiche de révision' : 'Modifier la fiche' }}</h1>
+  </div>
+
+  <div class="editor-content">
+    <div class="form-group">
+      <label for="deck-title">Titre du paquet</label>
+      <input
+        id="deck-title"
+        type="text"
+        [formControl]="titleControl"
+        placeholder="Ex: Vocabulaire anglais, Formules de maths...">
+    </div>
+
+    <!-- Zone d'import de fichier pour générer des fiches automatiquement -->
+    <section class="import-section">
+      <h2>📎 Importer depuis un fichier</h2>
+      <p class="import-hint">
+        Importez un fichier et l'IA créera automatiquement des fiches de révision à partir de son contenu.
+      </p>
+
+      @if (!aiService.isConfigured()) {
+        <div class="alert alert-warning alert-sm">
+          <span aria-hidden="true">⚠️</span>
+          <p>Veuillez d'abord <a routerLink="/settings">configurer votre clé API</a> pour utiliser l'import IA.</p>
+        </div>
+      } @else {
+        <div class="import-actions">
+          <label class="btn btn-outline btn-sm import-btn" [class.disabled]="extracting() || generating()">
+            @if (extracting()) {
+              <span class="spinner" aria-hidden="true"></span> Extraction du texte...
+            } @else if (generating()) {
+              <span class="spinner" aria-hidden="true"></span> Génération des fiches par l'IA...
+            } @else {
+              📄 Choisir un fichier (.txt, .docx, .pptx, .pdf)
+            }
+            <input
+              type="file"
+              accept=".txt,.docx,.pptx,.pdf"
+              (change)="onFileUpload($event)"
+              [disabled]="extracting() || generating()"
+              hidden
+              aria-label="Importer un fichier texte, Word ou PowerPoint">
+          </label>
+          @if (importedFileName()) {
+            <span class="imported-file">{{ importedFileName() }}</span>
+          }
+        </div>
+      }
+    </section>
+
+    <section class="cards-section">
+      <h2>Cartes ({{ cards().length }})</h2>
+
+      <div class="card-form">
+        <div class="card-fields">
+          <div class="form-group">
+            <label for="card-front">Recto (question)</label>
+            <textarea
+              id="card-front"
+              [formControl]="cardForm.controls.front"
+              placeholder="Ex: What is the capital of France?"
+              rows="2"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="card-back">Verso (réponse)</label>
+            <textarea
+              id="card-back"
+              [formControl]="cardForm.controls.back"
+              placeholder="Ex: Paris"
+              rows="2"></textarea>
+          </div>
+        </div>
+        <div class="card-form-actions">
+          <button class="btn btn-primary btn-sm" (click)="addCard()" [disabled]="cardForm.invalid" type="button">
+            {{ editingIndex() !== null ? '✏️ Modifier' : '➕ Ajouter' }}
+          </button>
+          @if (editingIndex() !== null) {
+            <button class="btn btn-ghost btn-sm" (click)="cancelEdit()" type="button">Annuler</button>
+          }
+        </div>
+      </div>
+
+      @if (cards().length === 0) {
+        <p class="empty-cards">Aucune carte. Ajoutez votre première carte ci-dessus.</p>
+      }
+
+      <div class="card-list">
+        @for (card of cards(); track card.id; let i = $index) {
+          <div class="card-item" [class.editing]="editingIndex() === i">
+            <div class="card-number">{{ i + 1 }}</div>
+            <div class="card-content">
+              <div class="card-side">
+                <span class="card-label">R</span>
+                <span>{{ card.front }}</span>
+              </div>
+              <div class="card-side">
+                <span class="card-label">V</span>
+                <span>{{ card.back }}</span>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-ghost btn-sm" (click)="editCard(i)" type="button" [attr.aria-label]="'Modifier carte ' + (i + 1)">✏️</button>
+              <button class="btn btn-ghost btn-sm" (click)="removeCard(i)" type="button" [attr.aria-label]="'Supprimer carte ' + (i + 1)">🗑️</button>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <div class="save-section">
+      @if (error()) {
+        <div class="alert alert-error" role="alert">
+          <span aria-hidden="true">❌</span>
+          <p>{{ error() }}</p>
+        </div>
+      }
+      <button
+        class="btn btn-primary btn-lg"
+        (click)="save()"
+        [disabled]="titleControl.invalid || cards().length === 0 || saving()"
+        type="button">
+        @if (saving()) {
+          <span class="spinner" aria-hidden="true"></span> Sauvegarde...
+        } @else {
+          💾 Sauvegarder
+        }
+      </button>
+    </div>
+  </div>
+</div>

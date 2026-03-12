@@ -1,0 +1,52 @@
+@if (result(); as res) {
+  <div class="quiz-result">
+    <section class="score-section">
+      <div class="score-circle" @scorePop [class.excellent]="scorePercentage() >= 70" [class.poor]="scorePercentage() < 50">
+        <span class="score-value">{{ res.score }}/{{ res.totalQuestions }}</span>
+        <span class="score-percent">{{ scorePercentage() }}%</span>
+      </div>
+      <h1 @fadeInUp>{{ scoreMessage() }}</h1>
+      <p class="score-subtitle" @fadeInUp>{{ res.quizTitle }}</p>
+    </section>
+
+    <section class="corrections" @fadeInUp>
+      <h2>Corrections détaillées</h2>
+      <div @staggerList>
+        @for (item of questionsWithAnswers(); track item.question.id) {
+          <div class="correction-card" @staggerItem [class.correct]="item.answer?.isCorrect" [class.incorrect]="!item.answer?.isCorrect">
+          <div class="correction-header">
+            <span class="badge">{{ typeLabel(item.question.type) }}</span>
+            <span
+              class="status-icon"
+              [attr.aria-label]="item.answer?.isCorrect ? 'Réponse correcte' : 'Réponse incorrecte'">
+              {{ item.answer?.isCorrect ? '✓' : '✗' }}
+            </span>
+          </div>
+          <h3>{{ item.question.question }}</h3>
+          <div class="answer-details">
+            <p class="user-answer">
+              <strong>Votre réponse :</strong>
+              {{ item.answer?.userAnswer || 'Pas de réponse' }}
+            </p>
+            @if (!item.answer?.isCorrect) {
+              <p class="correct-answer">
+                <strong>Réponse correcte :</strong>
+                {{ item.question.correctAnswer }}
+              </p>
+            }
+            @if (item.question.explanation) {
+              <p class="explanation">💡 {{ item.question.explanation }}</p>
+            }
+          </div>
+        </div>
+      }
+      </div>
+    </section>
+
+    <div class="result-actions" @fadeInUp>
+      <a [routerLink]="['/quiz', res.quizId]" class="btn btn-outline">🔄 Repasser le quiz</a>
+      <a routerLink="/generate" class="btn btn-primary">✨ Nouveau quiz</a>
+      <a routerLink="/" class="btn btn-ghost">Accueil</a>
+    </div>
+  </div>
+}

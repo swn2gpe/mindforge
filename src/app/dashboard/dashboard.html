@@ -1,0 +1,69 @@
+<div class="dashboard">
+  <section class="hero" @fadeInUp>
+    <div class="hero-badge">🧠 Propulsé par l'IA</div>
+    <h1>Transformez vos cours en <span class="highlight">quiz interactifs</span></h1>
+    <p class="hero-description">
+      Collez un cours ou importez un texte, et l'intelligence artificielle génère
+      automatiquement un quiz personnalisé pour réviser efficacement.
+    </p>
+    <a routerLink="/generate" class="btn btn-primary btn-lg">
+      ✨ Créer un quiz
+    </a>
+  </section>
+
+  <section class="stats" @staggerList>
+    <div class="stat-card" @staggerItem>
+      <span class="stat-value">{{ quizService.quizzes().length }}</span>
+      <span class="stat-label">Quiz créés</span>
+    </div>
+    <div class="stat-card" @staggerItem>
+      <span class="stat-value">{{ quizService.results().length }}</span>
+      <span class="stat-label">Quiz passés</span>
+    </div>
+    <div class="stat-card" @staggerItem>
+      <span class="stat-value">{{ quizService.averageScore() }}%</span>
+      <span class="stat-label">Score moyen</span>
+    </div>
+  </section>
+
+  @if (quizService.recentQuizzes().length > 0) {
+    <section class="recent" @fadeInUp>
+      <h2>Quiz récents</h2>
+      <div class="quiz-list" @staggerList>
+        @for (quiz of quizService.recentQuizzes(); track quiz.id) {
+          <div class="quiz-card" @staggerItem>
+            <div class="quiz-info">
+              <h3>{{ quiz.title }}</h3>
+              <p>{{ quiz.questions.length }} questions · {{ quiz.createdAt | date:'dd/MM/yyyy' }}</p>
+            </div>
+            <div class="quiz-actions">
+              <a [routerLink]="['/quiz', quiz.id]" class="btn btn-primary btn-sm">
+                Passer le quiz
+              </a>
+              <button
+                (click)="deleteQuiz(quiz.id)"
+                class="btn btn-ghost btn-sm"
+                type="button"
+                [attr.aria-label]="'Supprimer le quiz ' + quiz.title">
+                🗑️
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  @if (!aiService.isConfigured()) {
+    <section class="config-notice" @fadeInUp>
+      <div class="notice-card">
+        <span class="notice-icon" aria-hidden="true">⚙️</span>
+        <div>
+          <h3>Configuration requise</h3>
+          <p>Configurez votre clé API pour commencer à générer des quiz.</p>
+        </div>
+        <a routerLink="/settings" class="btn btn-outline">Configurer</a>
+      </div>
+    </section>
+  }
+</div>

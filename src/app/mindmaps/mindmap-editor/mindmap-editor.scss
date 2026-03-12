@@ -1,0 +1,247 @@
+// Palette de couleurs pour les branches de niveau 1
+$branch-colors: #6C63FF, #FF6584, #00C897, #FFB347, #4FC3F7, #AB47BC;
+
+.editor-page {
+  padding: 2rem 0;
+}
+.editor-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  h1 { margin: 0; font-size: 1.5rem; }
+}
+.editor-content {
+  max-width: 800px;
+}
+.tree-section {
+  margin-top: 2rem;
+
+  h2 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+}
+.tree-hint {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+.tree {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+}
+
+// === Noeud dans l'arbre ===
+.tree-node {
+  margin-bottom: 0.15rem;
+}
+
+.node-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+// Connecteur visuel (trait devant les enfants)
+.tree-connector {
+  width: 20px;
+  height: 2px;
+  background: var(--border);
+  flex-shrink: 0;
+  border-radius: 2px;
+}
+
+// === Pilule du noeud (éditeur) ===
+.node-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 1rem;
+  border-radius: 24px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.875rem;
+  outline: none;
+  background: var(--hover);
+
+  &:hover {
+    border-color: var(--primary);
+    transform: translateY(-1px);
+  }
+  &.selected {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15);
+  }
+  &.root-node {
+    background: linear-gradient(135deg, #6C63FF, #FF6584);
+    color: white;
+    font-weight: 700;
+    font-size: 1.05rem;
+    padding: 0.6rem 1.25rem;
+    box-shadow: 0 4px 16px rgba(108, 99, 255, 0.3);
+    border: none;
+
+    &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(108, 99, 255, 0.4); }
+    &.selected { box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.35); }
+
+    .node-delete { color: rgba(255,255,255,0.7); &:hover { color: white; background: rgba(255,255,255,0.15); } }
+    .node-count { background: rgba(255,255,255,0.25); color: white; }
+  }
+  &.branch-node {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+    .node-delete { color: rgba(255,255,255,0.7); &:hover { color: white; background: rgba(255,255,255,0.15); } }
+    .node-count { background: rgba(255,255,255,0.25); color: white; }
+  }
+  &.leaf-node {
+    font-size: 0.825rem;
+    border: 2px solid var(--border);
+  }
+  &:focus-visible {
+    box-shadow: 0 0 0 3px var(--primary-light);
+  }
+}
+
+// Couleurs automatiques pour les branches de niveau 1 dans l'éditeur
+.tree-node[data-depth="0"] > .node-children > .tree-node {
+  @for $i from 1 through 6 {
+    &:nth-child(#{$i}) > .node-row > .node-pill.branch-node {
+      background: nth($branch-colors, $i);
+    }
+    &:nth-child(#{$i}) > .node-row > .tree-connector {
+      background: nth($branch-colors, $i);
+    }
+    &:nth-child(#{$i}) .leaf-node {
+      border-color: rgba(nth($branch-colors, $i), 0.35);
+    }
+  }
+}
+
+.node-icon {
+  font-size: 0.9rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.node-label {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.node-count {
+  font-size: 0.6rem;
+  font-weight: 700;
+  background: rgba(0,0,0,0.08);
+  border-radius: 10px;
+  padding: 0.1rem 0.4rem;
+  min-width: 18px;
+  text-align: center;
+}
+.node-delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  padding: 0.2rem 0.4rem;
+  line-height: 1;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+
+  .node-row:hover & {
+    opacity: 1;
+  }
+  &:hover { color: var(--error); background: rgba(239, 68, 68, 0.1); }
+}
+
+// === Zone enfants ===
+.node-children {
+  padding-left: 1.5rem;
+  margin-top: 0.1rem;
+  border-left: 2px solid var(--border);
+  margin-left: 0.9rem;
+}
+
+// Pas de barre pour la racine — l'indentation suffit
+.tree-node[data-depth="0"] > .node-children {
+  border-left: none;
+  padding-left: 0.5rem;
+  margin-left: 0;
+}
+
+// === Formulaire ajout enfant ===
+.add-child-form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin: 0.5rem 0 0.5rem 2.5rem;
+}
+.add-child-input {
+  padding: 0.4rem 0.75rem;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  width: 220px;
+  transition: border-color 0.2s;
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+  }
+}
+
+// === Sauvegarde ===
+.save-section {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+// === Section d'import de fichier ===
+.import-section {
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+
+  h3 {
+    font-size: 1.05rem;
+    margin: 0 0 0.5rem;
+  }
+}
+.import-hint {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+.import-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.file-label {
+  cursor: pointer;
+}
+.file-name {
+  font-size: 0.8125rem;
+  color: var(--primary);
+}
+.progress-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}

@@ -1,0 +1,165 @@
+<div class="profile">
+  <h1>Mon profil</h1>
+  <p class="subtitle">Gérez vos informations personnelles et votre sécurité.</p>
+
+  <!-- Section avatar + infos rapides -->
+  <div class="profile-header" @scaleIn>
+    <div class="avatar-wrapper">
+      <button
+        class="avatar-large"
+        type="button"
+        (click)="triggerAvatarUpload()"
+        [attr.aria-label]="auth.currentUser()?.avatarUrl ? 'Changer la photo de profil' : 'Ajouter une photo de profil'"
+        [class.uploading]="avatarUploading()">
+        @if (auth.currentUser()?.avatarUrl) {
+          <img [src]="auth.currentUser()?.avatarUrl" alt="Photo de profil" class="avatar-img" />
+        } @else {
+          <span class="avatar-initials" aria-hidden="true">{{ initials() }}</span>
+        }
+        <span class="avatar-overlay" aria-hidden="true">
+          @if (avatarUploading()) {
+            <span class="avatar-spinner"></span>
+          } @else {
+            📷
+          }
+        </span>
+      </button>
+      @if (auth.currentUser()?.avatarUrl) {
+        <button
+          class="avatar-remove"
+          type="button"
+          (click)="removeAvatar()"
+          aria-label="Supprimer la photo de profil"
+          [disabled]="avatarUploading()">
+          ✕
+        </button>
+      }
+      <input
+        #fileInput
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        class="visually-hidden"
+        (change)="onAvatarSelected($event)"
+        aria-hidden="true"
+        tabindex="-1" />
+    </div>
+    <div class="profile-summary">
+      <h2>{{ auth.currentUser()?.displayName }}</h2>
+      <p>{{ auth.currentUser()?.email }}</p>
+      <p class="member-since">Membre depuis le {{ memberSince() }}</p>
+    </div>
+  </div>
+
+  <!-- Statistiques -->
+  @if (stats(); as s) {
+    <div class="stats-grid" @staggerList role="region" aria-label="Vos statistiques">
+      <div class="stat-card" @staggerItem>
+        <span class="stat-icon" aria-hidden="true">📝</span>
+        <span class="stat-value">{{ s.quizCount }}</span>
+        <span class="stat-label">Quiz créés</span>
+      </div>
+      <div class="stat-card" @staggerItem>
+        <span class="stat-icon" aria-hidden="true">🎯</span>
+        <span class="stat-value">{{ s.resultCount }}</span>
+        <span class="stat-label">Quiz complétés</span>
+      </div>
+      <div class="stat-card" @staggerItem>
+        <span class="stat-icon" aria-hidden="true">🗂️</span>
+        <span class="stat-value">{{ s.deckCount }}</span>
+        <span class="stat-label">Paquets de fiches</span>
+      </div>
+      <div class="stat-card" @staggerItem>
+        <span class="stat-icon" aria-hidden="true">🧠</span>
+        <span class="stat-value">{{ s.mindmapCount }}</span>
+        <span class="stat-label">Cartes mentales</span>
+      </div>
+      <div class="stat-card" @staggerItem>
+        <span class="stat-icon" aria-hidden="true">📁</span>
+        <span class="stat-value">{{ s.folderCount }}</span>
+        <span class="stat-label">Dossiers</span>
+      </div>
+    </div>
+  }
+
+  <!-- Formulaire de modification du profil -->
+  <section class="section-card" @fadeInUp>
+    <h3>Informations personnelles</h3>
+    <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+      <div class="form-group">
+        <label for="displayName">Nom affiché</label>
+        <input
+          id="displayName"
+          type="text"
+          formControlName="displayName"
+          autocomplete="name">
+      </div>
+
+      <div class="form-group">
+        <label for="email">Adresse email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          autocomplete="email">
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid || profileForm.pristine">
+          Enregistrer
+        </button>
+        @if (profileSaved()) {
+          <span class="success-message" role="status">✓ Profil mis à jour</span>
+        }
+        @if (profileError(); as error) {
+          <span class="error-message" role="alert">{{ error }}</span>
+        }
+      </div>
+    </form>
+  </section>
+
+  <!-- Formulaire de changement de mot de passe -->
+  <section class="section-card" @fadeInUp>
+    <h3>Changer le mot de passe</h3>
+    <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+      <div class="form-group">
+        <label for="currentPassword">Mot de passe actuel</label>
+        <input
+          id="currentPassword"
+          type="password"
+          formControlName="currentPassword"
+          autocomplete="current-password">
+      </div>
+
+      <div class="form-group">
+        <label for="newPassword">Nouveau mot de passe</label>
+        <input
+          id="newPassword"
+          type="password"
+          formControlName="newPassword"
+          autocomplete="new-password">
+        <small>Minimum 6 caractères.</small>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirmer le nouveau mot de passe</label>
+        <input
+          id="confirmPassword"
+          type="password"
+          formControlName="confirmPassword"
+          autocomplete="new-password">
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="passwordForm.invalid">
+          Changer le mot de passe
+        </button>
+        @if (passwordChanged()) {
+          <span class="success-message" role="status">✓ Mot de passe modifié</span>
+        }
+        @if (passwordError(); as error) {
+          <span class="error-message" role="alert">{{ error }}</span>
+        }
+      </div>
+    </form>
+  </section>
+</div>

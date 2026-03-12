@@ -1,0 +1,69 @@
+@if (deck(); as d) {
+  <div class="viewer-page">
+    <div class="viewer-header">
+      <a routerLink="/folders" class="btn btn-ghost btn-sm">← Retour</a>
+      <h1>{{ d.title }}</h1>
+      <a [routerLink]="['/flashcards', d.id, 'edit']" class="btn btn-outline btn-sm">✏️ Modifier</a>
+    </div>
+
+    @if (finished()) {
+      <div class="finished-state" @scaleIn>
+        <span class="finished-icon" aria-hidden="true">🎉</span>
+        <h2>Toutes les cartes ont été révisées !</h2>
+        <p>{{ d.cards.length }} cartes dans ce paquet</p>
+        <div class="finished-actions">
+          <button class="btn btn-primary" (click)="restart()" type="button">🔄 Recommencer</button>
+          <a routerLink="/folders" class="btn btn-outline">Retour aux dossiers</a>
+        </div>
+      </div>
+    } @else {
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="progress()"></div>
+      </div>
+      <p class="progress-label">Carte {{ currentIndex() + 1 }} / {{ d.cards.length }}</p>
+
+      @if (currentCard(); as card) {
+        <div
+          class="flashcard"
+          [class.flipped]="flipped()"
+          (click)="flip()"
+          (keydown.space)="flip(); $event.preventDefault()"
+          tabindex="0"
+          role="button"
+          [attr.aria-label]="flipped() ? 'Réponse : ' + card.back : 'Question : ' + card.front">
+          <div class="flashcard-inner">
+            <div class="flashcard-front">
+              <span class="card-badge">Question</span>
+              <p>{{ card.front }}</p>
+            </div>
+            <div class="flashcard-back">
+              <span class="card-badge badge-back">Réponse</span>
+              <p>{{ card.back }}</p>
+            </div>
+          </div>
+        </div>
+        <p class="flip-hint">Cliquez sur la carte pour la retourner</p>
+      }
+
+      <div class="nav-buttons">
+        <button
+          class="btn btn-outline"
+          (click)="previous()"
+          [disabled]="currentIndex() === 0"
+          type="button">
+          ← Précédente
+        </button>
+        <button
+          class="btn btn-primary"
+          (click)="next()"
+          type="button">
+          @if (currentIndex() === d.cards.length - 1) {
+            Terminer ✓
+          } @else {
+            Suivante →
+          }
+        </button>
+      </div>
+    }
+  </div>
+}

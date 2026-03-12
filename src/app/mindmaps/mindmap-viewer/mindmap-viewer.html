@@ -1,0 +1,48 @@
+@if (mindmap(); as mm) {
+  <div class="viewer-page">
+    <div class="viewer-header">
+      <a routerLink="/folders" class="btn btn-ghost btn-sm">← Retour</a>
+      <h1>{{ mm.title }}</h1>
+      <a [routerLink]="['/mindmaps', mm.id, 'edit']" class="btn btn-outline btn-sm">✏️ Modifier</a>
+    </div>
+
+    <div class="mindmap-canvas">
+      <div class="mindmap-centered">
+        <ng-container *ngTemplateOutlet="viewNode; context: { node: mm.root, depth: 0, parentColor: '' }"></ng-container>
+      </div>
+    </div>
+
+    <ng-template #viewNode let-node="node" let-depth="depth">
+      <div class="mm-node" [attr.data-depth]="depth">
+        <!-- Noeud lui-même -->
+        <div class="mm-pill"
+          [class.mm-root]="depth === 0"
+          [class.mm-branch]="depth === 1"
+          [class.mm-leaf]="depth >= 2">
+          <span class="mm-icon" aria-hidden="true">
+            @if (depth === 0) { 🧠 }
+            @else if (depth === 1) { 📌 }
+          </span>
+          <span class="mm-label">{{ node.label }}</span>
+          @if (node.children.length > 0 && depth < 2) {
+            <span class="mm-badge">{{ node.children.length }}</span>
+          }
+        </div>
+
+        <!-- Enfants -->
+        @if (node.children.length > 0) {
+          <div class="mm-children" [class.mm-children-root]="depth === 0">
+            @for (child of node.children; track child.id; let i = $index) {
+              <div class="mm-branch-wrapper" [style.--branch-index]="i" [style.--branch-total]="node.children.length">
+                <div class="mm-connector" aria-hidden="true">
+                  <div class="mm-connector-line"></div>
+                </div>
+                <ng-container *ngTemplateOutlet="viewNode; context: { node: child, depth: depth + 1 }"></ng-container>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </ng-template>
+  </div>
+}

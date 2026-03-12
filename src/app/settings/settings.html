@@ -1,0 +1,58 @@
+<div class="settings">
+  <h1>Paramètres</h1>
+  <p class="subtitle">Configurez votre connexion à l'API d'intelligence artificielle.</p>
+
+  <form [formGroup]="form" (ngSubmit)="save()" class="settings-form">
+    <div class="form-group">
+      <label for="provider">Fournisseur d'IA</label>
+      <select id="provider" formControlName="provider">
+        <option value="openai">OpenAI</option>
+        <option value="mistral">Mistral AI</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="apiKey">Clé API</label>
+      <input
+        id="apiKey"
+        type="password"
+        formControlName="apiKey"
+        placeholder="sk-..."
+        autocomplete="off">
+      <small>Votre clé est stockée uniquement dans votre navigateur (localStorage).</small>
+    </div>
+
+    <div class="form-group">
+      <label for="model">Modèle</label>
+      <input
+        id="model"
+        type="text"
+        formControlName="model"
+        placeholder="gpt-4o-mini">
+      <small>
+        @if (form.controls.provider.value === 'openai') {
+          Modèles suggérés : gpt-4o, gpt-4o-mini, gpt-3.5-turbo
+        } @else {
+          Modèles suggérés : mistral-large-latest, mistral-small-latest
+        }
+      </small>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid">
+        Sauvegarder
+      </button>
+      @if (saved()) {
+        <span class="success-message" role="status">✓ Configuration sauvegardée</span>
+      }
+    </div>
+  </form>
+
+  <div class="info-card">
+    <h3>💡 Comment obtenir une clé API ?</h3>
+    <ul>
+      <li><strong>OpenAI :</strong> Créez un compte sur platform.openai.com et générez une clé dans les paramètres API.</li>
+      <li><strong>Mistral AI :</strong> Inscrivez-vous sur console.mistral.ai et créez une clé API.</li>
+    </ul>
+  </div>
+</div>

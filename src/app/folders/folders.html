@@ -1,0 +1,134 @@
+<div class="folders-page">
+  <nav class="breadcrumbs" aria-label="Fil d'ariane">
+    @for (crumb of breadcrumbs(); track crumb.id; let last = $last) {
+      @if (!last) {
+        <button class="breadcrumb-link" (click)="navigateToFolder(crumb.id)" type="button">
+          {{ crumb.name }}
+        </button>
+        <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      } @else {
+        <span class="breadcrumb-current" aria-current="page">{{ crumb.name }}</span>
+      }
+    }
+  </nav>
+
+  <div class="page-header">
+    <h1>{{ currentFolder()?.name ?? 'Mes dossiers' }}</h1>
+    <div class="header-actions">
+      <button class="btn btn-outline" (click)="showNewFolder.set(!showNewFolder())" type="button">
+        📁 Nouveau dossier
+      </button>
+      <a [routerLink]="['/flashcards', 'new']"
+         [queryParams]="currentFolderId() ? { folder: currentFolderId() } : {}"
+         class="btn btn-outline">
+        🗂️ Nouvelle fiche
+      </a>
+      <a [routerLink]="['/mindmaps', 'new']"
+         [queryParams]="currentFolderId() ? { folder: currentFolderId() } : {}"
+         class="btn btn-outline">
+        🧠 Nouvelle carte mentale
+      </a>
+    </div>
+  </div>
+
+  @if (showNewFolder()) {
+    <div class="new-folder-form">
+      <input
+        [formControl]="folderName"
+        placeholder="Nom du dossier"
+        (keydown.enter)="createFolder()"
+        class="folder-input"
+        type="text">
+      <button class="btn btn-primary btn-sm" (click)="createFolder()" [disabled]="folderName.invalid" type="button">
+        Créer
+      </button>
+      <button class="btn btn-ghost btn-sm" (click)="showNewFolder.set(false)" type="button">
+        Annuler
+      </button>
+    </div>
+  }
+
+  @if (subFolders().length === 0 && decksHere().length === 0 && mindmapsHere().length === 0) {
+    <div class="empty-state">
+      <span class="empty-icon" aria-hidden="true">📂</span>
+      <h2>Ce dossier est vide</h2>
+      <p>Créez un dossier, des fiches de révision ou une carte mentale pour commencer.</p>
+    </div>
+  }
+
+  @if (subFolders().length > 0) {
+    <section class="section" @fadeInUp>
+      <h2 class="section-title">📁 Dossiers</h2>
+      <div class="grid" @staggerList>
+        @for (folder of subFolders(); track folder.id) {
+          <div class="item-card folder-card" @staggerItem (click)="navigateToFolder(folder.id)" (keydown.enter)="navigateToFolder(folder.id)" tabindex="0" role="button">
+            <div class="item-icon" [style.background]="folder.color">📁</div>
+            <div class="item-info">
+              <h3>{{ folder.name }}</h3>
+              <p>{{ folder.createdAt | date:'dd/MM/yyyy' }}</p>
+            </div>
+            <button
+              class="btn btn-ghost btn-sm delete-btn"
+              (click)="$event.stopPropagation(); deleteFolder(folder.id)"
+              type="button"
+              [attr.aria-label]="'Supprimer le dossier ' + folder.name">
+              🗑️
+            </button>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  @if (decksHere().length > 0) {
+    <section class="section" @fadeInUp>
+      <h2 class="section-title">🗂️ Fiches de révision</h2>
+      <div class="grid" @staggerList>
+        @for (deck of decksHere(); track deck.id) {
+          <div class="item-card deck-card" @staggerItem>
+            <a [routerLink]="['/flashcards', deck.id]" class="item-link">
+              <div class="item-icon deck-icon">🗂️</div>
+              <div class="item-info">
+                <h3>{{ deck.title }}</h3>
+                <p>{{ deck.cards.length }} cartes · {{ deck.createdAt | date:'dd/MM/yyyy' }}</p>
+              </div>
+            </a>
+            <button
+              class="btn btn-ghost btn-sm delete-btn"
+              (click)="deleteDeck(deck.id)"
+              type="button"
+              [attr.aria-label]="'Supprimer ' + deck.title">
+              🗑️
+            </button>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  @if (mindmapsHere().length > 0) {
+    <section class="section" @fadeInUp>
+      <h2 class="section-title">🧠 Cartes mentales</h2>
+      <div class="grid" @staggerList>
+        @for (mm of mindmapsHere(); track mm.id) {
+          <div class="item-card mindmap-card" @staggerItem>
+            <a [routerLink]="['/mindmaps', mm.id]" class="item-link">
+              <div class="item-icon mindmap-icon">🧠</div>
+              <div class="item-info">
+                <h3>{{ mm.title }}</h3>
+                <p>{{ mm.createdAt | date:'dd/MM/yyyy' }}</p>
+              </div>
+            </a>
+            <button
+              class="btn btn-ghost btn-sm delete-btn"
+              (click)="deleteMindmap(mm.id)"
+              type="button"
+              [attr.aria-label]="'Supprimer ' + mm.title">
+              🗑️
+            </button>
+          </div>
+        }
+      </div>
+    </section>
+  }
+</div>

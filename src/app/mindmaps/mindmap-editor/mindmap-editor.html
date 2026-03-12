@@ -1,0 +1,134 @@
+<div class="editor-page">
+  <div class="editor-header">
+    <a routerLink="/folders" class="btn btn-ghost btn-sm">← Retour</a>
+    <h1>{{ isNew ? 'Nouvelle carte mentale' : 'Modifier la carte mentale' }}</h1>
+  </div>
+
+  <div class="editor-content">
+    <div class="form-group">
+      <label for="mm-title">Titre</label>
+      <input
+        id="mm-title"
+        type="text"
+        [formControl]="titleControl"
+        placeholder="Ex: Révolution française, Biologie cellulaire...">
+    </div>
+
+    <section class="tree-section">
+      <h2>Arborescence</h2>
+
+      <!-- Section import de fichier -->
+      <div class="import-section">
+        <h3>📎 Importer depuis un fichier</h3>
+        <p class="import-hint">Importez un fichier et l'IA créera automatiquement une carte mentale à partir de son contenu.</p>
+        <div class="import-controls">
+          <label class="btn btn-ghost btn-sm file-label" for="mm-file-input">
+            📁 Choisir un fichier (.txt, .docx, .pptx, .pdf)
+          </label>
+          <input
+            id="mm-file-input"
+            type="file"
+            accept=".txt,.docx,.pptx,.pdf"
+            (change)="onFileUpload($event)"
+            hidden>
+          @if (importedFileName()) {
+            <span class="file-name">{{ importedFileName() }}</span>
+          }
+        </div>
+        @if (extracting()) {
+          <div class="progress-message" role="status">
+            <span class="spinner" aria-hidden="true"></span> Extraction du texte en cours...
+          </div>
+        }
+        @if (generating()) {
+          <div class="progress-message" role="status">
+            <span class="spinner" aria-hidden="true"></span> L'IA génère la carte mentale...
+          </div>
+        }
+      </div>
+
+      <p class="tree-hint">Cliquez sur un nœud pour le sélectionner et ajouter des enfants.</p>
+
+      <div class="tree">
+        <ng-container *ngTemplateOutlet="nodeTemplate; context: { node: root(), depth: 0 }"></ng-container>
+      </div>
+
+      <ng-template #nodeTemplate let-node="node" let-depth="depth">
+        <div class="tree-node" [attr.data-depth]="depth">
+          <div class="node-row">
+            @if (depth > 0) {
+              <span class="tree-connector" aria-hidden="true"></span>
+            }
+            <button
+              class="node-pill"
+              [class.selected]="selectedNodeId() === node.id"
+              [class.root-node]="depth === 0"
+              [class.branch-node]="depth === 1"
+              [class.leaf-node]="depth >= 2"
+              (click)="selectNode(node.id)"
+              type="button">
+              <span class="node-icon" aria-hidden="true">
+                @if (depth === 0) { 🧠 }
+                @else if (depth === 1) { 📌 }
+                @else { 📄 }
+              </span>
+              <span class="node-label">{{ node.label }}</span>
+              @if (node.children.length > 0) {
+                <span class="node-count">{{ node.children.length }}</span>
+              }
+            </button>
+            @if (depth > 0) {
+              <button
+                class="node-delete"
+                (click)="removeNode(node.id)"
+                type="button"
+                [attr.aria-label]="'Supprimer ' + node.label">×</button>
+            }
+          </div>
+
+          @if (selectedNodeId() === node.id) {
+            <div class="add-child-form">
+              <input
+                [formControl]="newChildLabel"
+                placeholder="Nouveau sous-élément..."
+                (keydown.enter)="addChild(node.id)"
+                class="add-child-input"
+                type="text">
+              <button class="btn btn-primary btn-sm" (click)="addChild(node.id)" [disabled]="!newChildLabel.value.trim()" type="button">
+                + Ajouter
+              </button>
+            </div>
+          }
+
+          @if (node.children.length > 0) {
+            <div class="node-children">
+              @for (child of node.children; track child.id) {
+                <ng-container *ngTemplateOutlet="nodeTemplate; context: { node: child, depth: depth + 1 }"></ng-container>
+              }
+            </div>
+          }
+        </div>
+      </ng-template>
+    </section>
+
+    <div class="save-section">
+      @if (error()) {
+        <div class="alert alert-error" role="alert">
+          <span aria-hidden="true">❌</span>
+          <p>{{ error() }}</p>
+        </div>
+      }
+      <button
+        class="btn btn-primary btn-lg"
+        (click)="save()"
+        [disabled]="titleControl.invalid || saving()"
+        type="button">
+        @if (saving()) {
+          <span class="spinner" aria-hidden="true"></span> Sauvegarde...
+        } @else {
+          💾 Sauvegarder
+        }
+      </button>
+    </div>
+  </div>
+</div>

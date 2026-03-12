@@ -90,7 +90,6 @@ import { AuthService } from '../../../services/auth.service';
       position: sticky;
       top: 0;
       z-index: 100;
-      backdrop-filter: blur(10px);
     }
     .header-container {
       max-width: 1200px;

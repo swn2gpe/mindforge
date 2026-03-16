@@ -14,6 +14,16 @@
     </div>
   }
 
+  <div class="deck-selector">
+    <label for="deckSelect">Utiliser un paquet de fiches existant :</label>
+    <select id="deckSelect" (change)="onDeckSelect($event)">
+      <option value="" disabled selected>-- Choisir un paquet --</option>
+      @for (deck of flashcardService.decks(); track deck.id) {
+        <option [value]="deck.id">{{ deck.title }} ({{ deck.cards.length }} cartes)</option>
+      }
+    </select>
+  </div>
+
   <form [formGroup]="form" (ngSubmit)="generate()">
     <div class="form-group">
       <label for="courseText">Contenu du cours</label>

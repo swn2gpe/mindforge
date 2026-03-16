@@ -4,6 +4,7 @@ import { RouterLink, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AiService } from '../../services/ai.service';
 import { QuizService } from '../../services/quiz.service';
+import { FlashcardService } from '../../services/flashcard.service';
 import { fadeInUp } from '../../shared/animations';
 
 // Composant pour générer un quiz à partir d'un texte collé ou d'un fichier importé
@@ -19,6 +20,7 @@ import { fadeInUp } from '../../shared/animations';
 export class QuizGeneratorComponent {
   protected readonly aiService = inject(AiService);
   private readonly quizService = inject(QuizService);
+  protected readonly flashcardService = inject(FlashcardService);
   private readonly router = inject(Router);
   private readonly http = inject(HttpClient);
 
@@ -38,6 +40,26 @@ export class QuizGeneratorComponent {
       validators: [Validators.required, Validators.minLength(100)]
     })
   });
+
+  // Convertit un paquet de fiches en texte pour le quiz
+  onDeckSelect(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    const deckId = select.value;
+    if (!deckId) return;
+
+    const deck = this.flashcardService.getDeck(deckId);
+    if (deck) {
+      const text = deck.cards
+        .map(card => `Q: ${card.front}\nA: ${card.back}`)
+        .join('\n\n');
+      
+      this.form.controls.text.setValue(text);
+      this.importedFileName.set(`Paquet : ${deck.title}`);
+      
+      // Reset select
+      select.value = '';
+    }
+  }
 
   // Permet d'importer un fichier (.txt, .docx, .pptx)
   // Les fichiers .txt sont lus directement, les autres sont envoyés au serveur pour extraction
